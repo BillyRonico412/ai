@@ -19,4 +19,7 @@ export default defineConfig({
 			"@front": path.resolve(__dirname, "./src"),
 		},
 	},
+	server: {
+		port: 3000,
+	},
 })

@@ -22,8 +22,9 @@
 		"erasableSyntaxOnly": true,
 		"noFallthroughCasesInSwitch": true,
 		"paths": {
-			"@front/*": ["./src/*"]
+			"@front/*": ["./src/*"],
+			"@back/*": ["../back/src/*"]
 		}
 	},
-	"include": ["src"]
+	"include": ["src", "../back/src"]
 }

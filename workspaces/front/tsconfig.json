@@ -6,7 +6,8 @@
 	],
 	"compilerOptions": {
 		"paths": {
-			"@front/*": ["./src/*"]
+			"@front/*": ["./src/*"],
+			"@back/*": ["../back/src/*"]
 		}
 	}
 }

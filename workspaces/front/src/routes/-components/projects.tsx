@@ -1,0 +1,59 @@
+import { Button } from "@front/components/ui/button"
+import {
+	Card,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@front/components/ui/card"
+import { Link, type LinkOptions } from "@tanstack/react-router"
+import { format } from "date-fns"
+import { ExternalLink } from "lucide-react"
+
+type Project = {
+	name: string
+	description: string
+	date: Date
+	url: LinkOptions["to"]
+}
+
+const projects: Project[] = [
+	{
+		name: "AI Chatbot",
+		description:
+			"Inspired by ChatGPT or Gemini, simple chatbot with history and customization options.",
+		date: new Date("2026-06-08"),
+		url: "/chat",
+	},
+]
+
+export const Projects = () => {
+	return (
+		<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+			{projects.map((project) => (
+				<Project key={project.name} project={project} />
+			))}
+		</div>
+	)
+}
+
+export const Project = (props: { project: Project }) => {
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>
+					{props.project.name} ({format(props.project.date, "MMMM yyyy")})
+				</CardTitle>
+				<CardDescription>{props.project.description}</CardDescription>
+			</CardHeader>
+			<CardFooter className="gap-4">
+				<Link to={props.project.url}>
+					<Button>
+						<ExternalLink />
+						View Project
+					</Button>
+				</Link>
+			</CardFooter>
+		</Card>
+	)
+}
