@@ -8,7 +8,7 @@ import superjson from "superjson"
 
 export const queryClient = new QueryClient()
 
-const trpcClient = createTRPCClient<AppRouter>({
+export const trpcClient = createTRPCClient<AppRouter>({
 	links: [
 		loggerLink(),
 		httpBatchLink({

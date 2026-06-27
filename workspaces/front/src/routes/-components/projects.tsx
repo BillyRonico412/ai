@@ -19,11 +19,11 @@ type Project = {
 
 const projects: Project[] = [
 	{
-		name: "AI Chatbot",
+		name: "Quiz generator",
 		description:
-			"Inspired by ChatGPT or Gemini, simple chatbot with history and customization options.",
-		date: new Date("2026-06-08"),
-		url: "/chat",
+			"An AI-powered quiz generator that creates quizzes based on user-provided topics.",
+		date: new Date("2026-06-22"),
+		url: "/quiz-generator",
 	},
 ]
 

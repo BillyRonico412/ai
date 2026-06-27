@@ -9,48 +9,72 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoggedRouteRouteImport } from './routes/_logged/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ChatIndexRouteImport } from './routes/chat/index'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as LoggedQuizGeneratorIndexRouteImport } from './routes/_logged/quiz-generator/index'
 
+const LoggedRouteRoute = LoggedRouteRouteImport.update({
+  id: '/_logged',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChatIndexRoute = ChatIndexRouteImport.update({
-  id: '/chat/',
-  path: '/chat/',
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoggedQuizGeneratorIndexRoute =
+  LoggedQuizGeneratorIndexRouteImport.update({
+    id: '/quiz-generator/',
+    path: '/quiz-generator/',
+    getParentRoute: () => LoggedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/chat/': typeof ChatIndexRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/quiz-generator/': typeof LoggedQuizGeneratorIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/chat': typeof ChatIndexRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/quiz-generator': typeof LoggedQuizGeneratorIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/chat/': typeof ChatIndexRoute
+  '/_logged': typeof LoggedRouteRouteWithChildren
+  '/auth/login': typeof AuthLoginRoute
+  '/_logged/quiz-generator/': typeof LoggedQuizGeneratorIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat/'
+  fullPaths: '/' | '/auth/login' | '/quiz-generator/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat'
-  id: '__root__' | '/' | '/chat/'
+  to: '/' | '/auth/login' | '/quiz-generator'
+  id: '__root__' | '/' | '/_logged' | '/auth/login' | '/_logged/quiz-generator/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ChatIndexRoute: typeof ChatIndexRoute
+  LoggedRouteRoute: typeof LoggedRouteRouteWithChildren
+  AuthLoginRoute: typeof AuthLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_logged': {
+      id: '/_logged'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof LoggedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -58,19 +82,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/chat/': {
-      id: '/chat/'
-      path: '/chat'
-      fullPath: '/chat/'
-      preLoaderRoute: typeof ChatIndexRouteImport
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_logged/quiz-generator/': {
+      id: '/_logged/quiz-generator/'
+      path: '/quiz-generator'
+      fullPath: '/quiz-generator/'
+      preLoaderRoute: typeof LoggedQuizGeneratorIndexRouteImport
+      parentRoute: typeof LoggedRouteRoute
     }
   }
 }
 
+interface LoggedRouteRouteChildren {
+  LoggedQuizGeneratorIndexRoute: typeof LoggedQuizGeneratorIndexRoute
+}
+
+const LoggedRouteRouteChildren: LoggedRouteRouteChildren = {
+  LoggedQuizGeneratorIndexRoute: LoggedQuizGeneratorIndexRoute,
+}
+
+const LoggedRouteRouteWithChildren = LoggedRouteRoute._addFileChildren(
+  LoggedRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChatIndexRoute: ChatIndexRoute,
+  LoggedRouteRoute: LoggedRouteRouteWithChildren,
+  AuthLoginRoute: AuthLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
