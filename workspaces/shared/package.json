@@ -1,0 +1,13 @@
+{
+  "name": "shared",
+  "private": true,
+  "exports": {
+    "./sentence-translator": "./sentence-translator.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

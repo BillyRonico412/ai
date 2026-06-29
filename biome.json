@@ -17,17 +17,27 @@
 		"rules": {
 			"preset": "recommended",
 			"style": {
-				"useComponentExportOnlyModules": "off"
+				"preset": "all",
+				"useComponentExportOnlyModules": "off",
+				"useSelfClosingElements": "on",
+				"noJsxLiterals": "off",
+				"noTernary": "off",
+				"noMagicNumbers": "off",
+				"useExportsLast": "off"
 			},
 			"a11y": {
 				"noStaticElementInteractions": "off",
 				"useKeyWithClickEvents": "off"
 			},
 			"suspicious": {
-				"noArrayIndexKey": "off"
+				"noArrayIndexKey": "off",
+				"noLeakedRender": "off"
 			},
 			"performance": {
 				"noJsxPropsBind": "off"
+			},
+			"correctness": {
+				"noChildrenProp": "off"
 			}
 		},
 		"domains": {

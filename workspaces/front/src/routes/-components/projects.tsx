@@ -25,6 +25,13 @@ const projects: Project[] = [
 		date: new Date("2026-06-22"),
 		url: "/quiz-generator",
 	},
+	{
+		name: "Sentence translator",
+		description:
+			"An AI powered tool that helps french users to improve their english skills by generating sentences and asking the user to translate them.",
+		date: new Date("2026-06-28"),
+		url: "/sentence-translator",
+	},
 ]
 
 export const Projects = () => {

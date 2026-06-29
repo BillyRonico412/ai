@@ -2,7 +2,7 @@ import { publicProcedure, router } from "@back/lib/trpc"
 import { generateText, Output } from "ai"
 import z from "zod"
 
-const quizGeneratorQuizZod = z.object({
+const zodQuizGeneratorQuiz = z.object({
 	title: z.string().min(1, "Title is required"),
 	questions: z
 		.array(
@@ -20,6 +20,14 @@ const quizGeneratorQuizZod = z.object({
 		.length(5, "Exactly 5 questions are required"),
 })
 
+const quizGeneratorSystemPrompt = `
+You are a quiz generator.
+You will be given a topic and you will generate a quiz based on that topic.
+The quiz should be in English or French.
+The difficulty of the quiz should be appropriate for a high school student.
+The difficulty increases with each question.
+`
+
 export const quizGeneratorRouter = router({
 	generateQuiz: publicProcedure
 		.input(
@@ -32,15 +40,10 @@ export const quizGeneratorRouter = router({
 		)
 		.mutation(async ({ input }) => {
 			const data = await generateText({
-				model: "openai/gpt-4o-mini",
-				system:
-					`You are a quiz generator.` +
-					`You will be given a topic and you will generate a quiz based on that topic.` +
-					`The quiz should be in English or French` +
-					`The difficulty of the quiz should be appropriate for a high school student.` +
-					`The difficulty increases with each question.`,
+				model: "anthropic/claude-haiku-4.5",
+				system: quizGeneratorSystemPrompt,
 				output: Output.object({
-					schema: quizGeneratorQuizZod,
+					schema: zodQuizGeneratorQuiz,
 				}),
 				prompt: `Generate a quiz based on the following topic: "${input.prompt}"`,
 			})
