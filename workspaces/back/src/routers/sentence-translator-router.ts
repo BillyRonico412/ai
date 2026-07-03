@@ -8,7 +8,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input }) => {
 			const res = await generateText({
-				model: "anthropic/claude-haiku-4.5",
+				model: "google/gemini-2.5-flash-lite",
 				system: generateSentenceSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -28,17 +28,29 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input }) => {
 			const res = await generateText({
-				model: "anthropic/claude-haiku-4.5",
+				model: "google/gemini-2.5-flash-lite",
 				system: correctAnswerSystemPrompt,
 				output: Output.object({
 					schema: z.object({
 						score: z.number().min(0).max(100),
+						strengths: z.string().min(1),
 						weaknesses: z.string().min(1),
 						corrections: z.array(
 							z.object({
 								error: z.string().min(1),
 								correction: z.string().min(1),
 								explanation: z.string().min(1),
+							}),
+						),
+						keyPointsToImprove: z.array(
+							z.object({
+								notion: z.string().min(1),
+								category: z.enum([
+									"grammaire",
+									"conjugaison",
+									"vocabulaire",
+									"syntaxe",
+								]),
 							}),
 						),
 						optimalTranslation: z.string().min(1),
@@ -50,7 +62,7 @@ export const sentenceTranslatorRouter = router({
 		}),
 	generateRandomTopic: publicProcedure.query(async () => {
 		const res = await generateText({
-			model: "openai/gpt-5-mini",
+			model: "google/gemini-2.5-flash-lite",
 			system: randomTopicSystemPrompt,
 			prompt: "Génère un sujet aléatoire pour un exercice de traduction.",
 		})
@@ -81,11 +93,15 @@ Tu es le professeur d'anglais personnel et mentor linguistique de l'application 
 
 Consignes d'évaluation :
 1. Note la proposition sur une échelle de 0 à 100. Sois rigoureux sur la grammaire, la conjugaison et l'ordre des mots (Sujet + Verbe + Complément).
-2. Si l'input de l'utilisateur est vide ou contient "flemme", attribue un score de 0, indique dans les faiblesses "Exercice passé", et concentre-toi sur l'explication pédagogique de la traduction optimale.
-3. Le champ "weaknesses" doit être un RÉSUMÉ court et général (1 phrase, 2 maximum) qui synthétise le type d'erreurs principales (ex: "Quelques erreurs de conjugaison et d'ordre des mots"). N'y mets AUCUN détail mot à mot : les détails précis vont uniquement dans le tableau "corrections".
-4. Remplis le tableau des "corrections" uniquement s'il y a des fautes. Chaque élément du tableau doit cibler le mot ou groupe de mots erroné, proposer la correction, et expliquer de manière concise la règle de grammaire sous-jacente en français.
-5. Fournis une "optimal_translation" qui représente la manière la plus naturelle et correcte de traduire la phrase au niveau demandé.
-
+2. Si l'input de l'utilisateur est vide ou contient "flemme", attribue un score de 0, indique dans les forces "Aucun point positif" et dans les faiblesses "Exercice passé", et concentre-toi sur l'explication pédagogique de la traduction optimale.
+3. Le champ "strengths" doit être un RÉSUMÉ court et général (1 phrase, 2 maximum) qui synthétise les points positifs de la traduction (ex: "Bon choix de vocabulaire et structure de phrase correcte").
+4. Le champ "weaknesses" doit être un RÉSUMÉ court et général (1 phrase, 2 maximum) qui synthétise le type d'erreurs principales (ex: "Quelques erreurs de conjugaison et d'ordre des mots"). N'y mets AUCUN détail mot à mot : les détails précis vont uniquement dans le tableau "corrections".
+5. Remplis le tableau des "corrections" uniquement s'il y a des fautes. Chaque élément du tableau doit cibler le mot ou groupe de mots erroné, proposer la correction, et expliquer de manière concise la règle de grammaire sous-jacente en français.
+6. Remplis le tableau "keyPointsToImprove" avec les NOTIONS de langue à réviser, déduites des erreurs commises. Chaque élément doit contenir :
+   - "notion": le nom précis de la notion à travailler en français (ex: "Le prétérit simple", "L'accord sujet-verbe", "Les prépositions de lieu", "L'ordre des adjectifs").
+   - "category": l'une des valeurs suivantes uniquement: "grammaire", "conjugaison", "vocabulaire" ou "syntaxe".
+   Ne mets PAS de notions déjà maîtrisées : uniquement celles à améliorer. Si aucune erreur, renvoie un tableau vide. Évite les doublons.
+7. Fournis une "optimal_translation" qui représente la manière la plus naturelle et correcte de traduire la phrase au niveau demandé.
 Réponds exclusivement au format JSON strict exigé, sans introduction ni conclusion.
 `
 

@@ -23,8 +23,9 @@ import { sentenceTranslatorAtoms } from "@front/routes/sentence-translator/-comp
 import { useForm } from "@tanstack/react-form"
 import { useSelector } from "@tanstack/react-store"
 import { useAtomValue, useSetAtom } from "jotai"
-import { ArrowRight, BotMessageSquare, Eye, Info } from "lucide-react"
+import { ArrowRight, BotMessageSquare, Copy, Eye, Info, RotateCcw } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 import z from "zod"
 
 const useSessionForm = () => {
@@ -164,9 +165,13 @@ const Session = (props: { form: SessionForm }) => {
 const Correction = (props: { form: SessionForm }) => {
 	const { form } = props
 	const correction = useAtomValue(sentenceTranslatorAtoms.correctionAtom)
+	const currentSentence = useAtomValue(
+		sentenceTranslatorAtoms.currentSentenceAtom,
+	)
 	const sentences = useAtomValue(sentenceTranslatorAtoms.sentencesAtom)
 	const indexSentence = useAtomValue(sentenceTranslatorAtoms.indexSentenceAtom)
 	const nextSentence = useSetAtom(sentenceTranslatorAtoms.nextSentenceAtom)
+	const reset = useSetAtom(sentenceTranslatorAtoms.resetAtom)
 	const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 	if (isSubmitting) {
 		return (
@@ -182,8 +187,30 @@ const Correction = (props: { form: SessionForm }) => {
 	if (!correction) {
 		return null
 	}
-	const { score, weaknesses, corrections, optimalTranslation } = correction
+	const {
+		score,
+		strengths,
+		weaknesses,
+		corrections,
+		keyPointsToImprove,
+		optimalTranslation,
+	} = correction
 	const isLastSentence = indexSentence >= sentences.length - 1
+	const copyLearningPrompt = async () => {
+		const prompt = buildLearningPrompt({
+			sentence: currentSentence.sentence,
+			userAnswer: form.state.values.userAnswer,
+			optimalTranslation,
+			keyPointsToImprove,
+		})
+		try {
+			await navigator.clipboard.writeText(prompt)
+			toast.success("Prompt copié ! Collez-le dans ChatGPT ou Gemini.")
+		} catch (error) {
+			console.error("Error copying prompt:", error)
+			toast.error("Impossible de copier le prompt.")
+		}
+	}
 	return (
 		<Card>
 			<CardHeader>
@@ -194,7 +221,17 @@ const Correction = (props: { form: SessionForm }) => {
 			</CardHeader>
 			<CardContent className="flex flex-col gap-6">
 				<div className="flex flex-col gap-1.5">
-					<span className="text-sm font-medium">Weaknesses</span>
+					<span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+						Points positifs
+					</span>
+					<p className="text-sm leading-relaxed text-muted-foreground">
+						{strengths}
+					</p>
+				</div>
+				<div className="flex flex-col gap-1.5">
+					<span className="text-sm font-medium text-destructive">
+						Points à améliorer
+					</span>
 					<p className="text-sm leading-relaxed text-muted-foreground">
 						{weaknesses}
 					</p>
@@ -226,19 +263,82 @@ const Correction = (props: { form: SessionForm }) => {
 						))}
 					</div>
 				)}
+				{keyPointsToImprove.length > 0 && (
+					<div className="flex flex-col gap-3">
+						<span className="text-sm font-medium">Notions à réviser</span>
+						<div className="flex flex-wrap gap-2">
+							{keyPointsToImprove.map((item) => (
+								<span
+									key={`${item.category}-${item.notion}`}
+									className="inline-flex items-center gap-1.5 rounded-full border bg-muted/40 px-3 py-1 text-xs"
+								>
+									<span className="font-medium">{item.notion}</span>
+									<span className="text-muted-foreground">
+										({item.category})
+									</span>
+								</span>
+							))}
+						</div>
+						<Button
+							type="button"
+							variant="outline"
+							className="self-start"
+							onClick={copyLearningPrompt}
+						>
+							<Copy />
+							Copier le prompt pour approfondir
+						</Button>
+					</div>
+				)}
 			</CardContent>
 			<CardFooter className="justify-end">
 				<Button
 					type="button"
 					onClick={() => {
-						nextSentence()
+						if (isLastSentence) {
+							reset()
+						} else {
+							nextSentence()
+						}
 						form.reset()
 					}}
 				>
-					{isLastSentence ? "See results" : "Next"}
-					<ArrowRight />
+					{isLastSentence ? "Reset" : "Next"}
+					{isLastSentence ? <RotateCcw /> : <ArrowRight />}
 				</Button>
 			</CardFooter>
 		</Card>
+	)
+}
+
+const buildLearningPrompt = (params: {
+	sentence: string
+	userAnswer: string
+	optimalTranslation: string
+	keyPointsToImprove: { notion: string; category: string }[]
+}) => {
+	const { sentence, userAnswer, optimalTranslation, keyPointsToImprove } =
+		params
+	const notionsList = keyPointsToImprove
+		.map((item) => `- ${item.notion} (${item.category})`)
+		.join("\n")
+	return (
+		"Je suis un développeur francophone qui apprend l'anglais en traduisant des phrases.\n" +
+		"\n" +
+		"Voici l'exercice que je viens de faire :\n" +
+		`- Phrase en français : "${sentence}"\n` +
+		`- Ma traduction : "${userAnswer}"\n` +
+		`- Traduction optimale : "${optimalTranslation}"\n` +
+		"\n" +
+		"Voici les notions de langue anglaise que je dois améliorer :\n" +
+		`${notionsList}\n` +
+		"\n" +
+		"Pour chacune de ces notions, peux-tu :\n" +
+		"1. M'expliquer la règle de manière claire et concise.\n" +
+		"2. Me montrer 2 ou 3 exemples concrets (avec traduction française).\n" +
+		"3. Me donner une astuce simple pour ne plus faire l'erreur.\n" +
+		"4. Me proposer un petit exercice pour m'entraîner sur cette notion.\n" +
+		"\n" +
+		"Réponds en français."
 	)
 }

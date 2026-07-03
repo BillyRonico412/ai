@@ -1,6 +1,5 @@
 import { sentenceTranslatorAtoms } from "@front/routes/sentence-translator/-components/atom"
 import { Config } from "@front/routes/sentence-translator/-components/config"
-import { Result } from "@front/routes/sentence-translator/-components/result"
 import { Translate } from "@front/routes/sentence-translator/-components/translate"
 import { createFileRoute } from "@tanstack/react-router"
 import { useAtomValue } from "jotai"
@@ -20,7 +19,6 @@ function RouteComponent() {
 					{match(step)
 						.with("config", () => <Config />)
 						.with("translate", () => <Translate />)
-						.with("result", () => <Result />)
 						.exhaustive()}
 				</div>
 			</div>

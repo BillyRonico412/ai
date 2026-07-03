@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import type z from "zod"
 
 export type ConfigForm = z.infer<typeof sentenceTranslatorShared.zodConfig>
-export type StepType = "config" | "translate" | "result"
+export type StepType = "config" | "translate"
 export type SentenceItem =
 	Outputs["sentenceTranslator"]["generateSenetences"][number]
 export type CorrectionAnswer = Outputs["sentenceTranslator"]["correctAnswer"]
@@ -62,9 +62,14 @@ const nextSentenceAtom = atom(null, (get, set) => {
 	if (index < sentences.length - 1) {
 		set(indexSentenceAtom, index + 1)
 		set(correctionAtom, undefined)
-	} else {
-		set(phaseAtom, "result")
 	}
+})
+
+const resetAtom = atom(null, (_, set) => {
+	set(phaseAtom, "config")
+	set(sentencesAtom, [])
+	set(indexSentenceAtom, 0)
+	set(correctionAtom, undefined)
 })
 
 const generateRandomTopicLoadingAtom = atom(false)
@@ -94,6 +99,7 @@ export const sentenceTranslatorAtoms = {
 	correctionAtom,
 	checkAnswerAtom,
 	nextSentenceAtom,
+	resetAtom,
 	generateRandomTopicAtom,
 	generateRandomTopicLoadingAtom,
 }
