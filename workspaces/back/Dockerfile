@@ -3,5 +3,4 @@ WORKDIR /app
 COPY . .
 RUN bun install
 WORKDIR /app/workspaces/back
-RUN bun x drizzle-kit push
-CMD ["bun", "start"]
+CMD ["sh", "-c", "bun x drizzle-kit push --config=drizzle.config.ts && bun start"]
