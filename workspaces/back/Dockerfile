@@ -1,6 +1,7 @@
 FROM oven/bun:1
 WORKDIR /app
 COPY . .
+RUN ls
 RUN bun install
 WORKDIR /app/workspaces/back
 RUN ls
