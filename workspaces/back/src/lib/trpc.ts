@@ -13,25 +13,40 @@ const t = initTRPC
 
 export const publicProcedure = t.procedure
 
-export const authedProcedure = publicProcedure.use((opts) => {
-	if (!opts.ctx.session) {
+const authedMiddleware = t.middleware(({ ctx, next }) => {
+	if (!ctx.session) {
 		throw new TRPCError({
 			code: "UNAUTHORIZED",
 			message: "You must be logged in to access this resource",
 		})
 	}
-	if (!opts.ctx.user) {
+	if (!ctx.user) {
 		throw new TRPCError({
 			code: "FORBIDDEN",
 			message: "You do not have permission to access this resource.",
 		})
 	}
-	return opts.next({
+	return next({
 		ctx: {
-			user: opts.ctx.user,
-			session: opts.ctx.session,
+			user: ctx.user,
+			session: ctx.session,
 		},
 	})
 })
 
-export const router = t.router
+export const quotaMiddleware = authedMiddleware.unstable_pipe(
+	({ ctx, next }) => {
+		if (ctx.user.quota <= 0) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "You do not have enough quota to perform this action.",
+			})
+		}
+		return next()
+	},
+)
+
+export const authedProcedure = publicProcedure.use(authedMiddleware)
+export const quotaProcedure = authedProcedure.use(quotaMiddleware)
+
+export const { router } = t

@@ -19,11 +19,18 @@ import {
 	ProgressLabel,
 	ProgressValue,
 } from "@front/components/ui/progress"
-import { sentenceTranslatorAtoms } from "@front/routes/sentence-translator/-components/atom"
+import { sentenceTranslatorAtoms } from "@front/routes/_authed/sentence-translator/-components/atom"
 import { useForm } from "@tanstack/react-form"
 import { useSelector } from "@tanstack/react-store"
 import { useAtomValue, useSetAtom } from "jotai"
-import { ArrowRight, BotMessageSquare, Copy, Eye, Info, RotateCcw } from "lucide-react"
+import {
+	ArrowRight,
+	BotMessageSquare,
+	Copy,
+	Eye,
+	Info,
+	RotateCcw,
+} from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import z from "zod"

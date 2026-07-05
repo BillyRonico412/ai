@@ -9,93 +9,93 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as SentenceTranslatorIndexRouteImport } from './routes/sentence-translator/index'
-import { Route as QuizGeneratorIndexRouteImport } from './routes/quiz-generator/index'
+import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
+import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthedSentenceTranslatorIndexRouteImport } from './routes/_authed/sentence-translator/index'
+import { Route as AuthedQuizGeneratorIndexRouteImport } from './routes/_authed/quiz-generator/index'
 
-const IndexRoute = IndexRouteImport.update({
+const AuthedRouteRoute = AuthedRouteRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SentenceTranslatorIndexRoute = SentenceTranslatorIndexRouteImport.update({
-  id: '/sentence-translator/',
-  path: '/sentence-translator/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizGeneratorIndexRoute = QuizGeneratorIndexRouteImport.update({
-  id: '/quiz-generator/',
-  path: '/quiz-generator/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedSentenceTranslatorIndexRoute =
+  AuthedSentenceTranslatorIndexRouteImport.update({
+    id: '/sentence-translator/',
+    path: '/sentence-translator/',
+    getParentRoute: () => AuthedRouteRoute,
+  } as any)
+const AuthedQuizGeneratorIndexRoute =
+  AuthedQuizGeneratorIndexRouteImport.update({
+    id: '/quiz-generator/',
+    path: '/quiz-generator/',
+    getParentRoute: () => AuthedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthedIndexRoute
   '/auth/login': typeof AuthLoginRoute
-  '/quiz-generator/': typeof QuizGeneratorIndexRoute
-  '/sentence-translator/': typeof SentenceTranslatorIndexRoute
+  '/quiz-generator/': typeof AuthedQuizGeneratorIndexRoute
+  '/sentence-translator/': typeof AuthedSentenceTranslatorIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
-  '/quiz-generator': typeof QuizGeneratorIndexRoute
-  '/sentence-translator': typeof SentenceTranslatorIndexRoute
+  '/': typeof AuthedIndexRoute
+  '/quiz-generator': typeof AuthedQuizGeneratorIndexRoute
+  '/sentence-translator': typeof AuthedSentenceTranslatorIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
-  '/quiz-generator/': typeof QuizGeneratorIndexRoute
-  '/sentence-translator/': typeof SentenceTranslatorIndexRoute
+  '/_authed/': typeof AuthedIndexRoute
+  '/_authed/quiz-generator/': typeof AuthedQuizGeneratorIndexRoute
+  '/_authed/sentence-translator/': typeof AuthedSentenceTranslatorIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/auth/login' | '/quiz-generator/' | '/sentence-translator/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/login' | '/quiz-generator' | '/sentence-translator'
+  to: '/auth/login' | '/' | '/quiz-generator' | '/sentence-translator'
   id:
     | '__root__'
-    | '/'
+    | '/_authed'
     | '/auth/login'
-    | '/quiz-generator/'
-    | '/sentence-translator/'
+    | '/_authed/'
+    | '/_authed/quiz-generator/'
+    | '/_authed/sentence-translator/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
-  QuizGeneratorIndexRoute: typeof QuizGeneratorIndexRoute
-  SentenceTranslatorIndexRoute: typeof SentenceTranslatorIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/': {
+      id: '/_authed/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sentence-translator/': {
-      id: '/sentence-translator/'
-      path: '/sentence-translator'
-      fullPath: '/sentence-translator/'
-      preLoaderRoute: typeof SentenceTranslatorIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz-generator/': {
-      id: '/quiz-generator/'
-      path: '/quiz-generator'
-      fullPath: '/quiz-generator/'
-      preLoaderRoute: typeof QuizGeneratorIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthedIndexRouteImport
+      parentRoute: typeof AuthedRouteRoute
     }
     '/auth/login': {
       id: '/auth/login'
@@ -104,14 +104,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/sentence-translator/': {
+      id: '/_authed/sentence-translator/'
+      path: '/sentence-translator'
+      fullPath: '/sentence-translator/'
+      preLoaderRoute: typeof AuthedSentenceTranslatorIndexRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/quiz-generator/': {
+      id: '/_authed/quiz-generator/'
+      path: '/quiz-generator'
+      fullPath: '/quiz-generator/'
+      preLoaderRoute: typeof AuthedQuizGeneratorIndexRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
   }
 }
 
+interface AuthedRouteRouteChildren {
+  AuthedIndexRoute: typeof AuthedIndexRoute
+  AuthedQuizGeneratorIndexRoute: typeof AuthedQuizGeneratorIndexRoute
+  AuthedSentenceTranslatorIndexRoute: typeof AuthedSentenceTranslatorIndexRoute
+}
+
+const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
+  AuthedIndexRoute: AuthedIndexRoute,
+  AuthedQuizGeneratorIndexRoute: AuthedQuizGeneratorIndexRoute,
+  AuthedSentenceTranslatorIndexRoute: AuthedSentenceTranslatorIndexRoute,
+}
+
+const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
+  AuthedRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AuthedRouteRoute: AuthedRouteRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
-  QuizGeneratorIndexRoute: QuizGeneratorIndexRoute,
-  SentenceTranslatorIndexRoute: SentenceTranslatorIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

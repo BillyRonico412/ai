@@ -1,7 +1,7 @@
 import z from "zod"
 
 const zodEnv = z.object({
-	DB_FILE_NAME: z.string(),
+	DATABASE_URL: z.string(),
 	BETTER_AUTH_URL: z.string(),
 	GOOGLE_CLIENT_SECRET: z.string(),
 	GOOGLE_CLIENT_ID: z.string(),

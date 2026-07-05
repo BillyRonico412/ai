@@ -23,7 +23,8 @@
 				"noJsxLiterals": "off",
 				"noTernary": "off",
 				"noMagicNumbers": "off",
-				"useExportsLast": "off"
+				"useExportsLast": "off",
+				"useNamingConvention": "off"
 			},
 			"a11y": {
 				"noStaticElementInteractions": "off",

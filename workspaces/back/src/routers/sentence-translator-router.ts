@@ -1,12 +1,13 @@
-import { publicProcedure, router } from "@back/lib/trpc"
+import { quotaProcedure, router } from "@back/lib/trpc"
+import { increaseQuota } from "@back/lib/utils"
 import { generateText, Output } from "ai"
 import { sentenceTranslatorShared } from "shared/sentence-translator"
 import z from "zod"
 
 export const sentenceTranslatorRouter = router({
-	generateSenetences: publicProcedure
+	generateSenetences: quotaProcedure
 		.input(sentenceTranslatorShared.zodConfig)
-		.query(async ({ input }) => {
+		.query(async ({ input, ctx }) => {
 			const res = await generateText({
 				model: "google/gemini-2.5-flash-lite",
 				system: generateSentenceSystemPrompt,
@@ -22,11 +23,12 @@ export const sentenceTranslatorRouter = router({
 				}),
 				prompt: `Génère ${input.nbSentences} phrases en français sur le thème "${input.theme}" pour un niveau ${input.level}.`,
 			})
+			await increaseQuota(ctx.user.id)
 			return res.output.sentences
 		}),
-	correctAnswer: publicProcedure
+	correctAnswer: quotaProcedure
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
-		.query(async ({ input }) => {
+		.query(async ({ input, ctx }) => {
 			const res = await generateText({
 				model: "google/gemini-2.5-flash-lite",
 				system: correctAnswerSystemPrompt,
@@ -58,14 +60,16 @@ export const sentenceTranslatorRouter = router({
 				}),
 				prompt: `Évalue la traduction anglaise "${input.userAnswer}" pour la phrase française "${input.sentence}".`,
 			})
+			await increaseQuota(ctx.user.id)
 			return res.output
 		}),
-	generateRandomTopic: publicProcedure.query(async () => {
+	generateRandomTopic: quotaProcedure.query(async ({ ctx }) => {
 		const res = await generateText({
 			model: "google/gemini-2.5-flash-lite",
 			system: randomTopicSystemPrompt,
 			prompt: "Génère un sujet aléatoire pour un exercice de traduction.",
 		})
+		await increaseQuota(ctx.user.id)
 		return res.text
 	}),
 })

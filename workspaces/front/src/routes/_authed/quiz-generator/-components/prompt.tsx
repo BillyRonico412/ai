@@ -5,7 +5,7 @@ import {
 	InputGroupButton,
 	InputGroupTextarea,
 } from "@front/components/ui/input-group"
-import { quizGeneratorAtoms } from "@front/routes/quiz-generator/-components/atoms"
+import { quizGeneratorAtoms } from "@front/routes/_authed/quiz-generator/-components/atoms"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 
 export const Prompt = () => {

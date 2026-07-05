@@ -34,33 +34,29 @@ const projects: Project[] = [
 	},
 ]
 
-export const Projects = () => {
-	return (
-		<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-			{projects.map((project) => (
-				<Project key={project.name} project={project} />
-			))}
-		</div>
-	)
-}
+export const Projects = () => (
+	<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+		{projects.map((project) => (
+			<Project key={project.name} project={project} />
+		))}
+	</div>
+)
 
-export const Project = (props: { project: Project }) => {
-	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>
-					{props.project.name} ({format(props.project.date, "MMMM yyyy")})
-				</CardTitle>
-				<CardDescription>{props.project.description}</CardDescription>
-			</CardHeader>
-			<CardFooter className="gap-4">
-				<Link to={props.project.url}>
-					<Button>
-						<ExternalLink />
-						View Project
-					</Button>
-				</Link>
-			</CardFooter>
-		</Card>
-	)
-}
+export const Project = (props: { project: Project }) => (
+	<Card>
+		<CardHeader>
+			<CardTitle>
+				{props.project.name} ({format(props.project.date, "MMMM yyyy")})
+			</CardTitle>
+			<CardDescription>{props.project.description}</CardDescription>
+		</CardHeader>
+		<CardFooter className="gap-4 mt-auto">
+			<Link to={props.project.url}>
+				<Button>
+					<ExternalLink />
+					View Project
+				</Button>
+			</Link>
+		</CardFooter>
+	</Card>
+)

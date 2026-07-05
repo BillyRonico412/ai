@@ -19,7 +19,7 @@ import { Spinner } from "@front/components/ui/spinner"
 import {
 	type ConfigForm,
 	sentenceTranslatorAtoms,
-} from "@front/routes/sentence-translator/-components/atom"
+} from "@front/routes/_authed/sentence-translator/-components/atom"
 import { useForm } from "@tanstack/react-form"
 import { useAtomValue, useSetAtom } from "jotai"
 import { Dices } from "lucide-react"

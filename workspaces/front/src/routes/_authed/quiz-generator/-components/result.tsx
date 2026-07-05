@@ -10,7 +10,7 @@ import { cn } from "@front/lib/utils"
 import {
 	type QuizGeneratorQuestionType,
 	quizGeneratorAtoms,
-} from "@front/routes/quiz-generator/-components/atoms"
+} from "@front/routes/_authed/quiz-generator/-components/atoms"
 import { useAtomValue, useSetAtom } from "jotai"
 
 export const Result = () => {
@@ -72,7 +72,7 @@ export const Result = () => {
 				size="lg"
 				className="w-full sm:flex-1"
 				onClick={() => resetQuiz()}
-			> 
+			>
 				Take Another Quiz
 			</Button>
 		</div>

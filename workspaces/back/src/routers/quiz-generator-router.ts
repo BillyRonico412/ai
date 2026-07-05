@@ -1,4 +1,5 @@
-import { publicProcedure, router } from "@back/lib/trpc"
+import { quotaProcedure, router } from "@back/lib/trpc"
+import { increaseQuota } from "@back/lib/utils"
 import { generateText, Output } from "ai"
 import z from "zod"
 
@@ -29,7 +30,7 @@ The difficulty increases with each question.
 `
 
 export const quizGeneratorRouter = router({
-	generateQuiz: publicProcedure
+	generateQuiz: quotaProcedure
 		.input(
 			z.object({
 				prompt: z
@@ -38,7 +39,7 @@ export const quizGeneratorRouter = router({
 					.max(100, "Prompt must be less than 100 characters"),
 			}),
 		)
-		.mutation(async ({ input }) => {
+		.mutation(async ({ input, ctx }) => {
 			const data = await generateText({
 				model: "anthropic/claude-haiku-4.5",
 				system: quizGeneratorSystemPrompt,
@@ -47,6 +48,7 @@ export const quizGeneratorRouter = router({
 				}),
 				prompt: `Generate a quiz based on the following topic: "${input.prompt}"`,
 			})
+			await increaseQuota(ctx.user.id)
 			return data.output
 		}),
 })

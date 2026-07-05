@@ -10,7 +10,9 @@ export const queryClient = new QueryClient()
 
 export const trpcClient = createTRPCClient<AppRouter>({
 	links: [
-		loggerLink(),
+		loggerLink({
+			enabled: () => true,
+		}),
 		httpBatchLink({
 			url: `${env.VITE_SERVER_URL}/trpc`,
 			transformer: superjson,

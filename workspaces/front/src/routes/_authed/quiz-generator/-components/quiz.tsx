@@ -10,7 +10,7 @@ import { cn } from "@front/lib/utils"
 import {
 	type QuizGeneratorQuestionType,
 	quizGeneratorAtoms,
-} from "@front/routes/quiz-generator/-components/atoms"
+} from "@front/routes/_authed/quiz-generator/-components/atoms"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useMemo } from "react"
 
