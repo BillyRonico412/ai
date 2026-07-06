@@ -9,7 +9,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "google/gemini-2.5-flash-lite",
+				model: "google/gemini-2.5-flash",
 				system: generateSentenceSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -30,7 +30,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "google/gemini-2.5-flash-lite",
+				model: "google/gemini-2.5-flash",
 				system: correctAnswerSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -65,7 +65,7 @@ export const sentenceTranslatorRouter = router({
 		}),
 	generateRandomTopic: quotaProcedure.query(async ({ ctx }) => {
 		const res = await generateText({
-			model: "google/gemini-2.5-flash-lite",
+			model: "google/gemini-2.5-flash",
 			system: randomTopicSystemPrompt,
 			prompt: "Génère un sujet aléatoire pour un exercice de traduction.",
 		})
