@@ -116,14 +116,14 @@ const Profile = () => {
 				</Avatar>
 			</PopoverTrigger>
 			<PopoverContent className="space-y-3" align="end">
-				<div>
-					<Progress
-						value={session.user.quota}
-						className="w-full max-w-sm items-center"
-					>
-						<ProgressLabel>AI Quota</ProgressLabel>
-						<ProgressValue />
-					</Progress>
+				<p className="text-center text-sm text-muted-foreground">
+					{session.user.email}
+				</p>
+				<div className="flex items-center gap-1">
+					<p className="text-sm text-muted-foreground">Quota remaining</p>
+					<p className="text-sm font-medium text-foreground ml-auto">
+						{session.user.quota}
+					</p>
 				</div>
 				<div className="flex gap-1 items-center">
 					<Button
