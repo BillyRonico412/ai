@@ -13,6 +13,7 @@ export type CorrectionAnswer = Outputs["sentenceTranslator"]["correctAnswer"]
 const phaseAtom = atom<StepType>("config")
 const sentencesAtom = atom<SentenceItem[]>([])
 const indexSentenceAtom = atom(0)
+const hintVisibleAtom = atom(false)
 
 const currentSentenceAtom = atom((get) => {
 	const sentences = get(sentencesAtom)
@@ -62,6 +63,7 @@ const nextSentenceAtom = atom(null, (get, set) => {
 	if (index < sentences.length - 1) {
 		set(indexSentenceAtom, index + 1)
 		set(correctionAtom, undefined)
+		set(hintVisibleAtom, false)
 	}
 })
 
@@ -102,4 +104,5 @@ export const sentenceTranslatorAtoms = {
 	resetAtom,
 	generateRandomTopicAtom,
 	generateRandomTopicLoadingAtom,
+	hintVisibleAtom,
 }

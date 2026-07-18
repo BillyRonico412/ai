@@ -22,7 +22,7 @@ import {
 import { sentenceTranslatorAtoms } from "@front/routes/_authed/sentence-translator/-components/atom"
 import { useForm } from "@tanstack/react-form"
 import { useSelector } from "@tanstack/react-store"
-import { useAtomValue, useSetAtom } from "jotai"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import {
 	ArrowRight,
 	BotMessageSquare,
@@ -31,7 +31,6 @@ import {
 	Info,
 	RotateCcw,
 } from "lucide-react"
-import { useState } from "react"
 import { toast } from "sonner"
 import z from "zod"
 
@@ -88,7 +87,9 @@ const Session = (props: { form: SessionForm }) => {
 	const currentSentence = useAtomValue(
 		sentenceTranslatorAtoms.currentSentenceAtom,
 	)
-	const [isHintVisible, setIsHintVisible] = useState(false)
+	const [hintVisible, setIsHintVisible] = useAtom(
+		sentenceTranslatorAtoms.hintVisibleAtom,
+	)
 	const correction = useAtomValue(sentenceTranslatorAtoms.correctionAtom)
 	return (
 		<Card>
@@ -155,7 +156,7 @@ const Session = (props: { form: SessionForm }) => {
 										)}
 									/>
 								</InputGroup>
-								{isHintVisible && (
+								{hintVisible && (
 									<FieldDescription className="text-sm text-muted-foreground mt-2">
 										Hint: {currentSentence.hint}
 									</FieldDescription>

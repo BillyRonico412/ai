@@ -9,7 +9,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "google/gemini-2.5-flash",
+				model: "google/gemini-3.5-flash",
 				system: generateSentenceSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -30,7 +30,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "google/gemini-2.5-flash",
+				model: "google/gemini-3.5-flash",
 				system: correctAnswerSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -65,12 +65,18 @@ export const sentenceTranslatorRouter = router({
 		}),
 	generateRandomTopic: quotaProcedure.query(async ({ ctx }) => {
 		const res = await generateText({
-			model: "google/gemini-2.5-flash",
+			model: "google/gemini-3.5-flash",
 			system: randomTopicSystemPrompt,
-			prompt: "Génère un sujet aléatoire pour un exercice de traduction.",
+			output: Output.object({
+				schema: z.object({
+					subject: z.string().min(1),
+				}),
+			}),
+			prompt:
+				"Génère un sujet aléatoire pour un exercice de traduction français-anglais.",
 		})
 		await increaseQuota(ctx.user.id)
-		return res.text
+		return res.output.subject
 	}),
 })
 
@@ -96,7 +102,7 @@ const correctAnswerSystemPrompt = `
 Tu es le professeur d'anglais personnel et mentor linguistique de l'application SyntaxCraft. Ton rôle est d'analyser la traduction anglaise proposée par l'utilisateur pour une phrase française donnée.
 
 Consignes d'évaluation :
-1. Note la proposition sur une échelle de 0 à 100. Sois rigoureux sur la grammaire, la conjugaison et l'ordre des mots (Sujet + Verbe + Complément).
+1. Note la proposition sur une échelle de 0 à 100. Sois rigoureux sur la grammaire un peu moins sur la conjugaison. Et sois indulgent sur le vocabulaire. La note doit refléter la qualité globale de la traduction, en tenant compte de la fidélité au sens, de la fluidité et de la précision grammaticale.
 2. Si l'input de l'utilisateur est vide ou contient "flemme", attribue un score de 0, indique dans les forces "Aucun point positif" et dans les faiblesses "Exercice passé", et concentre-toi sur l'explication pédagogique de la traduction optimale.
 3. Le champ "strengths" doit être un RÉSUMÉ court et général (1 phrase, 2 maximum) qui synthétise les points positifs de la traduction (ex: "Bon choix de vocabulaire et structure de phrase correcte").
 4. Le champ "weaknesses" doit être un RÉSUMÉ court et général (1 phrase, 2 maximum) qui synthétise le type d'erreurs principales (ex: "Quelques erreurs de conjugaison et d'ordre des mots"). N'y mets AUCUN détail mot à mot : les détails précis vont uniquement dans le tableau "corrections".
@@ -116,6 +122,5 @@ Consignes de génération :
 1. Le sujet doit être en français.
 2. Le sujet doit être concis, idéalement une phrase courte ou un groupe nominal.
 3. Le sujet doit être approprié pour un apprenant de niveau A1 à C2.
-4. Le sujet doit être original et stimulant, évitant les clichés ou les sujets trop génériques.
-5. Le sujet doit être formulé de manière à inspirer la créativité et l'engagement de l'apprenant.
+4. Le sujet doit être formulé de manière à inspirer la créativité et l'engagement de l'apprenant.
 `
