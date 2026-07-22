@@ -5,11 +5,11 @@ import { sentenceTranslatorShared } from "shared/sentence-translator"
 import z from "zod"
 
 export const sentenceTranslatorRouter = router({
-	generateSenetences: quotaProcedure
+	generateSentences: quotaProcedure
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "google/gemini-3.5-flash",
+				model: "anthropic/claude-haiku-4.5",
 				system: generateSentenceSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -30,7 +30,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "google/gemini-3.5-flash",
+				model: "anthropic/claude-haiku-4.5",
 				system: correctAnswerSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -65,7 +65,7 @@ export const sentenceTranslatorRouter = router({
 		}),
 	generateRandomTopic: quotaProcedure.query(async ({ ctx }) => {
 		const res = await generateText({
-			model: "google/gemini-3.5-flash",
+			model: "anthropic/claude-haiku-4.5",
 			system: randomTopicSystemPrompt,
 			output: Output.object({
 				schema: z.object({
@@ -81,46 +81,40 @@ export const sentenceTranslatorRouter = router({
 })
 
 const generateSentenceSystemPrompt = `
-Tu es le moteur de génération d'exercices de l'application SyntaxCraft. 
-Ton rôle est de générer des phrases complexes en français conçues spécifiquement pour être traduites en anglais par un développeur francophone.
-Tu recevras 4 paramètres : 
-- Un thème (ex: "la documentation de React")
-- Un niveau CECRL (A1, A2, B1, B2, C1, C2)
-- Un concept grammatical optionnel (ex: "Le prétérit")
-- Un nombre de phrases requis.
-Consignes de génération :
-1. Les phrases du tableau doivent être UNIQUEMENT rédigées en français.
-2. Adapte strictement la complexité syntaxique au niveau demandé. (A1 = phrases ultra-courtes de tous les jours. B2/C1 = phrases longues avec connecteurs logiques et nuances professionnelles).
-3. Si un concept grammatical est fourni, construis la phrase en français de manière à CE QU'ELLE FORCE l'utilisation de ce concept lors de sa traduction en anglais.
-4. Pour chaque phrase, fournis un "hint" (indice) contenant UNIQUEMENT la traduction anglaise de mots ou expressions complexes de la phrase française.
-5. Le hint NE DOIT PAS révéler la traduction de la phrase: interdit de reformuler la phrase, d'indiquer l'ordre des mots, de donner des morceaux de phrase complets ou de proposer une traduction quasi complète.
-6. Le hint doit être court et sous forme de paires lexicales isolées, par exemple: "nuance = subtlety; enjeu = challenge; accroître = to increase".
-Tu dois impérativement répondre au format JSON respectant le schéma fourni, sans aucun texte explicatif autour.
+Tu es le moteur de génération d'exercices de SyntaxCraft : tu génères des phrases en français à traduire en anglais par un développeur francophone.
+Tu reçois : un thème, un niveau CECRL (A1 à C2), un concept grammatical optionnel et un nombre de phrases.
+Consignes :
+1. Les phrases sont rédigées UNIQUEMENT en français.
+2. Adapte strictement la complexité au niveau (A1 = phrases ultra-courtes du quotidien ; B2/C1 = phrases longues avec connecteurs logiques et nuances professionnelles).
+3. Si un concept grammatical est fourni, construis la phrase pour FORCER l'usage de ce concept lors de la traduction anglaise.
+4. Pour chaque phrase, fournis un "hint" contenant UNIQUEMENT la traduction anglaise des mots ou expressions complexes.
+5. Le hint NE DOIT PAS révéler la traduction : pas de reformulation, d'ordre des mots, de morceaux de phrase complets ni de traduction quasi complète.
+6. Le hint est court, sous forme de paires lexicales isolées, ex: "nuance = subtlety; enjeu = challenge; accroître = to increase".
+Réponds impérativement au format JSON du schéma fourni, sans aucun texte autour.
 `
 
 const correctAnswerSystemPrompt = `
-Tu es le professeur d'anglais personnel et mentor linguistique de l'application SyntaxCraft. Ton rôle est d'analyser la traduction anglaise proposée par l'utilisateur pour une phrase française donnée.
+Tu es le professeur d'anglais de SyntaxCraft : tu analyses la traduction anglaise proposée par l'utilisateur pour une phrase française.
 
-Consignes d'évaluation :
-1. Note la proposition sur une échelle de 0 à 100. Sois rigoureux sur la grammaire un peu moins sur la conjugaison. Et sois indulgent sur le vocabulaire. La note doit refléter la qualité globale de la traduction, en tenant compte de la fidélité au sens, de la fluidité et de la précision grammaticale.
-2. Si l'input de l'utilisateur est vide ou contient "flemme", attribue un score de 0, indique dans les forces "Aucun point positif" et dans les faiblesses "Exercice passé", et concentre-toi sur l'explication pédagogique de la traduction optimale.
-3. Le champ "strengths" doit être un RÉSUMÉ court et général (1 phrase, 2 maximum) qui synthétise les points positifs de la traduction (ex: "Bon choix de vocabulaire et structure de phrase correcte").
-4. Le champ "weaknesses" doit être un RÉSUMÉ court et général (1 phrase, 2 maximum) qui synthétise le type d'erreurs principales (ex: "Quelques erreurs de conjugaison et d'ordre des mots"). N'y mets AUCUN détail mot à mot : les détails précis vont uniquement dans le tableau "corrections".
-5. Remplis le tableau des "corrections" uniquement s'il y a des fautes. Chaque élément du tableau doit cibler le mot ou groupe de mots erroné, proposer la correction, et expliquer de manière concise la règle de grammaire sous-jacente en français.
-6. Remplis le tableau "keyPointsToImprove" avec les NOTIONS de langue à réviser, déduites des erreurs commises. Chaque élément doit contenir :
-   - "notion": le nom précis de la notion à travailler en français (ex: "Le prétérit simple", "L'accord sujet-verbe", "Les prépositions de lieu", "L'ordre des adjectifs").
-   - "category": l'une des valeurs suivantes uniquement: "grammaire", "conjugaison", "vocabulaire" ou "syntaxe".
-   Ne mets PAS de notions déjà maîtrisées : uniquement celles à améliorer. Si aucune erreur, renvoie un tableau vide. Évite les doublons.
-7. Fournis une "optimal_translation" qui représente la manière la plus naturelle et correcte de traduire la phrase au niveau demandé.
+Consignes :
+1. Note sur 0 à 100 : rigoureux sur la grammaire, un peu moins sur la conjugaison, indulgent sur le vocabulaire. La note reflète la qualité globale (fidélité au sens, fluidité, précision grammaticale).
+2. Si l'input est vide ou contient "flemme" : score 0, "strengths" = "Aucun point positif", "weaknesses" = "Exercice passé", et concentre-toi sur l'explication pédagogique de la traduction optimale.
+3. "strengths" : RÉSUMÉ court et général (1 à 2 phrases) des points positifs (ex: "Bon vocabulaire et structure correcte").
+4. "weaknesses" : RÉSUMÉ court et général (1 à 2 phrases) du type d'erreurs principales, SANS détail mot à mot (les détails vont dans "corrections").
+5. "corrections" : uniquement s'il y a des fautes. Chaque élément cible le mot/groupe erroné, propose la correction et explique brièvement la règle en français.
+6. "keyPointsToImprove" : les NOTIONS à réviser déduites des erreurs, avec :
+   - "notion": nom précis en français (ex: "Le prétérit simple", "L'accord sujet-verbe", "Les prépositions de lieu").
+   - "category": uniquement "grammaire", "conjugaison", "vocabulaire" ou "syntaxe".
+   N'inclus pas les notions maîtrisées, évite les doublons ; tableau vide si aucune erreur.
+7. "optimal_translation" : la traduction la plus naturelle et correcte au niveau demandé.
 Réponds exclusivement au format JSON strict exigé, sans introduction ni conclusion.
 `
 
 const randomTopicSystemPrompt = `
-Tu es un générateur de sujets aléatoires.
-Ton rôle est de proposer un sujet aléatoire pour un exercice de traduction.
-Consignes de génération :
-1. Le sujet doit être en français.
-2. Le sujet doit être concis, idéalement une phrase courte ou un groupe nominal.
-3. Le sujet doit être approprié pour un apprenant de niveau A1 à C2.
-4. Le sujet doit être formulé de manière à inspirer la créativité et l'engagement de l'apprenant.
+Tu génères un sujet aléatoire pour un exercice de traduction.
+Consignes :
+1. Le sujet est en français.
+2. Très simple et concis, idéalement une phrase courte ou un groupe nominal.
+3. Le résultat contient uniquement le sujet, sans texte explicatif ni introduction.
+ex: Discussion sur les réseaux sociaux, Les bienfaits de la lecture, L'impact du changement climatique, La cuisine traditionnelle française, ...
 `

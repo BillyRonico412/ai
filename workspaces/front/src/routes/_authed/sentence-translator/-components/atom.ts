@@ -7,7 +7,7 @@ import type z from "zod"
 export type ConfigForm = z.infer<typeof sentenceTranslatorShared.zodConfig>
 export type StepType = "config" | "translate"
 export type SentenceItem =
-	Outputs["sentenceTranslator"]["generateSenetences"][number]
+	Outputs["sentenceTranslator"]["generateSentences"][number]
 export type CorrectionAnswer = Outputs["sentenceTranslator"]["correctAnswer"]
 
 const phaseAtom = atom<StepType>("config")
@@ -28,7 +28,7 @@ const generateSentencesAtom = atom(
 	async (_, set, configForm: ConfigForm) => {
 		try {
 			const sentences =
-				await trpcClient.sentenceTranslator.generateSenetences.query(configForm)
+				await trpcClient.sentenceTranslator.generateSentences.query(configForm)
 			set(sentencesAtom, sentences)
 			set(indexSentenceAtom, 0)
 			set(phaseAtom, "translate")

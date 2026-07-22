@@ -12,7 +12,7 @@ const zodConfig = z.object({
 
 const zodCorrectAnswer = z.object({
 	sentence: z.string().min(1, { message: "Sentence is required" }),
-	userAnswer: z.string().min(1, { message: "User answer is required" }),
+	userAnswer: z.string(),
 })
 
 export const sentenceTranslatorShared = {

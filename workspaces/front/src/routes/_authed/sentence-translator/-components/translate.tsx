@@ -75,7 +75,7 @@ const ProgressBar = () => {
 }
 
 const zodSession = z.object({
-	userAnswer: z.string().min(1, { message: "User answer is required" }),
+	userAnswer: z.string(),
 })
 
 const defaultValues: SessionInput = {
@@ -131,6 +131,10 @@ const Session = (props: { form: SessionForm }) => {
 													type="button"
 													variant="outline"
 													disabled={!!correction || isSubmitting}
+													onClick={() => {
+														form.setFieldValue("userAnswer", "")
+														form.handleSubmit()
+													}}
 												>
 													<Eye />
 													Reveal answer
@@ -331,7 +335,7 @@ const buildLearningPrompt = (params: {
 		.map((item) => `- ${item.notion} (${item.category})`)
 		.join("\n")
 	return (
-		"Je suis un développeur francophone qui apprend l'anglais en traduisant des phrases.\n" +
+		"Je suis en train d'apprendre l'anglais et j'ai besoin de ton aide pour m'améliorer.\n" +
 		"\n" +
 		"Voici l'exercice que je viens de faire :\n" +
 		`- Phrase en français : "${sentence}"\n` +
@@ -345,7 +349,6 @@ const buildLearningPrompt = (params: {
 		"1. M'expliquer la règle de manière claire et concise.\n" +
 		"2. Me montrer 2 ou 3 exemples concrets (avec traduction française).\n" +
 		"3. Me donner une astuce simple pour ne plus faire l'erreur.\n" +
-		"4. Me proposer un petit exercice pour m'entraîner sur cette notion.\n" +
 		"\n" +
 		"Réponds en français."
 	)

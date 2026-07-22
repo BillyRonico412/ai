@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authed/sentence-translator/")({
 function RouteComponent() {
 	const step = useAtomValue(sentenceTranslatorAtoms.phaseAtom)
 	return (
-		<div className="h-full w-full flex flex-col gap-8">
+		<div className="h-full w-full flex flex-col gap-8 overflow-y-auto">
 			<div className="container max-w-3xl mx-auto h-full px-4 py-4">
 				{match(step)
 					.with("config", () => <Config />)

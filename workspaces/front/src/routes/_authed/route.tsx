@@ -11,11 +11,6 @@ import {
 	PopoverTrigger,
 } from "@front/components/ui/popover"
 import {
-	Progress,
-	ProgressLabel,
-	ProgressValue,
-} from "@front/components/ui/progress"
-import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
@@ -26,6 +21,7 @@ import {
 	Link,
 	Outlet,
 	redirect,
+	useNavigate,
 	useRouteContext,
 	useRouter,
 } from "@tanstack/react-router"
@@ -33,10 +29,13 @@ import { Code, Globe, LogOut, RefreshCcw } from "lucide-react"
 
 export const Route = createFileRoute("/_authed")({
 	component: RouteComponent,
-	async beforeLoad({ context }) {
+	async beforeLoad({ context, location }) {
 		if (!context.session) {
 			throw redirect({
 				to: "/auth/login",
+				search: {
+					redirectTo: location.href,
+				},
 			})
 		}
 		return {
@@ -47,7 +46,7 @@ export const Route = createFileRoute("/_authed")({
 
 function RouteComponent() {
 	return (
-		<div className="w-dvw h-dvh flex flex-col">
+		<div className="w-dvw h-dvh flex flex-col overflow-x-hidden">
 			<NavBar />
 			<div className="flex-1">
 				<Outlet />
@@ -106,6 +105,9 @@ const Profile = () => {
 	const { session } = useRouteContext({
 		from: "/_authed",
 	})
+	const navigate = useNavigate({
+		from: "/",
+	})
 	const router = useRouter()
 	return (
 		<Popover>
@@ -139,7 +141,12 @@ const Profile = () => {
 					</Button>
 					<Button
 						size="sm"
-						onClick={() => authClient.signOut()}
+						onClick={() => {
+							authClient.signOut()
+							navigate({
+								to: "/auth/login",
+							})
+						}}
 						className="flex-1"
 					>
 						<LogOut />

@@ -18,9 +18,7 @@ function RootLayout() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<TooltipProvider>
-				<main className="w-full h-dvh">
-					<Outlet />
-				</main>
+				<Outlet />
 			</TooltipProvider>
 		</QueryClientProvider>
 	)
