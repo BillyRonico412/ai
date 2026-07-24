@@ -9,7 +9,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "anthropic/claude-haiku-4.5",
+				model: "moonshotai/kimi-k2.6",
 				system: generateSentenceSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -30,7 +30,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "anthropic/claude-haiku-4.5",
+				model: "moonshotai/kimi-k2.6",
 				system: correctAnswerSystemPrompt,
 				output: Output.object({
 					schema: z.object({
@@ -65,7 +65,7 @@ export const sentenceTranslatorRouter = router({
 		}),
 	generateRandomTopic: quotaProcedure.query(async ({ ctx }) => {
 		const res = await generateText({
-			model: "anthropic/claude-haiku-4.5",
+			model: "moonshotai/kimi-k2.6",
 			system: randomTopicSystemPrompt,
 			output: Output.object({
 				schema: z.object({

@@ -12,7 +12,7 @@ import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupButton,
-	InputGroupInput,
+	InputGroupTextarea,
 } from "@front/components/ui/input-group"
 import {
 	Progress,
@@ -106,7 +106,7 @@ const Session = (props: { form: SessionForm }) => {
 							<Field>
 								<FieldLabel>Translation</FieldLabel>
 								<InputGroup>
-									<InputGroupInput
+									<InputGroupTextarea
 										id={field.name}
 										name={field.name}
 										value={field.state.value}
