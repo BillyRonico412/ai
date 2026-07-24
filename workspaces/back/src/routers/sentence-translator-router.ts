@@ -9,8 +9,9 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "moonshotai/kimi-k2.6",
+				model: "anthropic/claude-sonnet-5",
 				system: generateSentenceSystemPrompt,
+				reasoning: "none",
 				output: Output.object({
 					schema: z.object({
 						sentences: z.array(
@@ -30,8 +31,9 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "moonshotai/kimi-k2.6",
+				model: "anthropic/claude-sonnet-5",
 				system: correctAnswerSystemPrompt,
+				reasoning: "none",
 				output: Output.object({
 					schema: z.object({
 						score: z.number().min(0).max(100),
@@ -65,8 +67,10 @@ export const sentenceTranslatorRouter = router({
 		}),
 	generateRandomTopic: quotaProcedure.query(async ({ ctx }) => {
 		const res = await generateText({
-			model: "moonshotai/kimi-k2.6",
+			model: "anthropic/claude-sonnet-5",
 			system: randomTopicSystemPrompt,
+			seed: Date.now(),
+			reasoning: "none",
 			output: Output.object({
 				schema: z.object({
 					subject: z.string().min(1),
