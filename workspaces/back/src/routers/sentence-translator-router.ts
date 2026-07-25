@@ -69,7 +69,7 @@ export const sentenceTranslatorRouter = router({
 		const res = await generateText({
 			model: "anthropic/claude-sonnet-5",
 			system: randomTopicSystemPrompt,
-			seed: Date.now(),
+			temperature: 1.0,
 			reasoning: "none",
 			output: Output.object({
 				schema: z.object({
