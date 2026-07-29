@@ -76,8 +76,9 @@ export const sentenceTranslatorRouter = router({
 					subject: z.string().min(1),
 				}),
 			}),
-			prompt:
-				"Génère un sujet aléatoire pour un exercice de traduction français-anglais.",
+			prompt: `Génère un sujet concret et original pour un exercice de traduction français-anglais.
+N'utilise jamais les sujets suivants : réseaux sociaux, lecture, changement climatique, cuisine française.
+Identifiant de génération : ${crypto.randomUUID()}`,
 		})
 		await increaseQuota(ctx.user.id)
 		return res.output.subject
@@ -120,5 +121,5 @@ Consignes :
 1. Le sujet est en français.
 2. Très simple et concis, idéalement une phrase courte ou un groupe nominal.
 3. Le résultat contient uniquement le sujet, sans texte explicatif ni introduction.
-ex: Discussion sur les réseaux sociaux, Les bienfaits de la lecture, L'impact du changement climatique, La cuisine traditionnelle française, ...
+4. Choisis un domaine concret différent à chaque génération.
 `
