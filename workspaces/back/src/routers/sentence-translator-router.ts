@@ -65,7 +65,7 @@ export const sentenceTranslatorRouter = router({
 			await increaseQuota(ctx.user.id)
 			return res.output
 		}),
-	generateRandomTopic: quotaProcedure.query(async ({ ctx }) => {
+	generateRandomTopic: quotaProcedure.mutation(async ({ ctx }) => {
 		const res = await generateText({
 			model: "anthropic/claude-sonnet-5",
 			system: randomTopicSystemPrompt,

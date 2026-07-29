@@ -80,7 +80,7 @@ const generateRandomTopicAtom = atom(null, async (_, set) => {
 	try {
 		set(generateRandomTopicLoadingAtom, true)
 		const topic =
-			await trpcClient.sentenceTranslator.generateRandomTopic.query()
+			await trpcClient.sentenceTranslator.generateRandomTopic.mutate()
 		return topic
 	} catch (error) {
 		console.error("Error generating random topic:", error)
