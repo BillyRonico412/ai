@@ -9,7 +9,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "anthropic/claude-sonnet-5",
+				model: "google/gemini-3.5-flash-lite",
 				system: generateSentenceSystemPrompt,
 				reasoning: "none",
 				output: Output.object({
@@ -31,7 +31,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "anthropic/claude-sonnet-5",
+				model: "google/gemini-3.5-flash-lite",
 				system: correctAnswerSystemPrompt,
 				reasoning: "none",
 				output: Output.object({
@@ -67,7 +67,7 @@ export const sentenceTranslatorRouter = router({
 		}),
 	generateRandomTopic: quotaProcedure.mutation(async ({ ctx }) => {
 		const res = await generateText({
-			model: "anthropic/claude-sonnet-5",
+			model: "google/gemini-3.5-flash-lite",
 			system: randomTopicSystemPrompt,
 			temperature: 1.0,
 			reasoning: "none",

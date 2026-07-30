@@ -7,6 +7,15 @@ import { match } from "ts-pattern"
 
 export const Route = createFileRoute("/_authed/sentence-translator/")({
 	component: RouteComponent,
+	head() {
+		return {
+			meta: [
+				{
+					title: "Sentence Translator",
+				},
+			],
+		}
+	},
 })
 
 function RouteComponent() {

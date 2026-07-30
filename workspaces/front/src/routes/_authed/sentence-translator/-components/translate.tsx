@@ -19,6 +19,7 @@ import {
 	ProgressLabel,
 	ProgressValue,
 } from "@front/components/ui/progress"
+import { speek } from "@front/lib/speech"
 import { sentenceTranslatorAtoms } from "@front/routes/_authed/sentence-translator/-components/atom"
 import { useForm } from "@tanstack/react-form"
 import { useSelector } from "@tanstack/react-store"
@@ -30,6 +31,7 @@ import {
 	Eye,
 	Info,
 	RotateCcw,
+	Volume2,
 } from "lucide-react"
 import { toast } from "sonner"
 import z from "zod"
@@ -248,11 +250,23 @@ const Correction = (props: { form: SessionForm }) => {
 						{weaknesses}
 					</p>
 				</div>
-				<div className="flex flex-col gap-1.5">
-					<span className="text-sm font-medium">Optimal translation</span>
-					<p className="text-sm leading-relaxed text-muted-foreground">
-						{optimalTranslation}
-					</p>
+				<div className="flex items-center gap-2">
+					<div className="flex flex-col gap-1.5">
+						<span className="text-sm font-medium">Optimal translation</span>
+						<p className="text-sm leading-relaxed text-muted-foreground">
+							{optimalTranslation}
+						</p>
+					</div>
+					<Button
+						size="xs"
+						variant="outline"
+						className="ml-auto"
+						onClick={() => {
+							speek({ text: optimalTranslation })
+						}}
+					>
+						<Volume2 />
+					</Button>
 				</div>
 				{corrections.length > 0 && (
 					<div className="flex flex-col gap-3">
