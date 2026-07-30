@@ -69,7 +69,7 @@ export const sentenceTranslatorRouter = router({
 		const res = await generateText({
 			model: "google/gemini-3.5-flash-lite",
 			system: randomTopicSystemPrompt,
-			temperature: 1.0,
+			temperature: 0.7,
 			reasoning: "none",
 			output: Output.object({
 				schema: z.object({
