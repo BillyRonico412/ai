@@ -43,7 +43,7 @@ export const LessonField = (props: { form: SentenceTranslatorFormType }) => {
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
 									aria-invalid={isInvalid}
-									placeholder="Simple discussion about a cat"
+									placeholder="Present continuous"
 									autoComplete="off"
 								/>
 								<InputGroupAddon align="inline-end">
@@ -63,13 +63,13 @@ export const LessonField = (props: { form: SentenceTranslatorFormType }) => {
 				}}
 			/>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="max-w-xl">
+				<DialogContent className="max-w-xl h-full">
 					<DialogHeader>
 						<DialogTitle>Select a lesson</DialogTitle>
 					</DialogHeader>
 					<form.Subscribe selector={(state) => state.values.level}>
 						{(level) => (
-							<div className="flex flex-col gap-2">
+							<div className="flex flex-col gap-2 overflow-y-auto">
 								{lessons
 									.filter((lesson) => lesson.level === level)
 									.map((lesson) => (
