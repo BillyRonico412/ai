@@ -65,33 +65,15 @@ export const sentenceTranslatorRouter = router({
 			await increaseQuota(ctx.user.id)
 			return res.output
 		}),
-	generateRandomTopic: quotaProcedure.mutation(async ({ ctx }) => {
-		const res = await generateText({
-			model: "google/gemini-3.5-flash-lite",
-			system: randomTopicSystemPrompt,
-			temperature: 0.7,
-			reasoning: "none",
-			output: Output.object({
-				schema: z.object({
-					subject: z.string().min(1),
-				}),
-			}),
-			prompt: `Génère un sujet concret et original pour un exercice de traduction français-anglais.
-N'utilise jamais les sujets suivants : réseaux sociaux, lecture, changement climatique, cuisine française.
-Identifiant de génération : ${crypto.randomUUID()}`,
-		})
-		await increaseQuota(ctx.user.id)
-		return res.output.subject
-	}),
 })
 
 const generateSentenceSystemPrompt = `
-Tu es le moteur de génération d'exercices de SyntaxCraft : tu génères des phrases en français à traduire en anglais par un développeur francophone.
-Tu reçois : un thème, un niveau CECRL (A1 à C2), un concept grammatical optionnel et un nombre de phrases.
+Tu es le moteur de génération d'exercices de SyntaxCraft : tu génères des phrases en français à traduire en anglais par un francophone.
+Tu reçois : un thème, un lesson (ou non) a approfondir, un niveau CECRL (A1 à C2), un concept grammatical optionnel et un nombre de phrases.
 Consignes :
 1. Les phrases sont rédigées UNIQUEMENT en français.
 2. Adapte strictement la complexité au niveau (A1 = phrases ultra-courtes du quotidien ; B2/C1 = phrases longues avec connecteurs logiques et nuances professionnelles).
-3. Si un concept grammatical est fourni, construis la phrase pour FORCER l'usage de ce concept lors de la traduction anglaise.
+3. Si un lesson est fourni, construis la phrase pour FORCER l'usage de ce concept lors de la traduction anglaise.
 4. Pour chaque phrase, fournis un "hint" contenant UNIQUEMENT la traduction anglaise des mots ou expressions complexes.
 5. Le hint NE DOIT PAS révéler la traduction : pas de reformulation, d'ordre des mots, de morceaux de phrase complets ni de traduction quasi complète.
 6. Le hint est court, sous forme de paires lexicales isolées, ex: "nuance = subtlety; enjeu = challenge; accroître = to increase".
@@ -113,13 +95,4 @@ Consignes :
    N'inclus pas les notions maîtrisées, évite les doublons ; tableau vide si aucune erreur.
 7. "optimal_translation" : la traduction la plus naturelle et correcte au niveau demandé.
 Réponds exclusivement au format JSON strict exigé, sans introduction ni conclusion.
-`
-
-const randomTopicSystemPrompt = `
-Tu génères un sujet aléatoire pour un exercice de traduction.
-Consignes :
-1. Le sujet est en français.
-2. Très simple et concis, idéalement une phrase courte ou un groupe nominal.
-3. Le résultat contient uniquement le sujet, sans texte explicatif ni introduction.
-4. Choisis un domaine concret différent à chaque génération.
 `

@@ -1,4 +1,4 @@
-import { Button } from "@front/components/ui/button"
+import { Button } from '@front/components/ui/button'
 import {
 	Card,
 	CardAction,
@@ -7,185 +7,22 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@front/components/ui/card"
-import { Field, FieldDescription, FieldLabel } from "@front/components/ui/field"
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupButton,
-	InputGroupTextarea,
-} from "@front/components/ui/input-group"
-import {
-	Progress,
-	ProgressLabel,
-	ProgressValue,
-} from "@front/components/ui/progress"
 import { speek } from "@front/lib/speech"
-import { sentenceTranslatorAtoms } from "@front/routes/_authed/sentence-translator/-components/atom"
-import { useForm } from "@tanstack/react-form"
+import { sentenceTranslator } from "@front/routes/_authed/sentence-translator/-components/atom"
+import type { SessionForm } from '@front/routes/_authed/sentence-translator/-components/translate/session-form'
 import { useSelector } from "@tanstack/react-store"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import {
-	ArrowRight,
-	BotMessageSquare,
-	Copy,
-	Eye,
-	Info,
-	RotateCcw,
-	Volume2,
-} from "lucide-react"
+import { useAtomValue, useSetAtom } from "jotai"
+import { ArrowRight, Copy, RotateCcw, Volume2 } from "lucide-react"
 import { toast } from "sonner"
-import z from "zod"
 
-const useSessionForm = () => {
-	const checkAnswer = useSetAtom(sentenceTranslatorAtoms.checkAnswerAtom)
-	const form = useForm({
-		defaultValues,
-		validators: {
-			onSubmit: zodSession,
-		},
-		onSubmit: async ({ value }) => {
-			await checkAnswer(value.userAnswer)
-		},
-	})
-	return form
-}
-
-type SessionForm = ReturnType<typeof useSessionForm>
-type SessionInput = z.infer<typeof zodSession>
-
-export const Translate = () => {
-	const form = useSessionForm()
-	return (
-		<div className="w-full h-full flex flex-col gap-8">
-			<ProgressBar />
-			<Session form={form} />
-			<Correction form={form} />
-		</div>
-	)
-}
-
-const ProgressBar = () => {
-	const sentences = useAtomValue(sentenceTranslatorAtoms.sentencesAtom)
-	const indexSentence = useAtomValue(sentenceTranslatorAtoms.indexSentenceAtom)
-	const progress = (indexSentence / sentences.length) * 100
-	return (
-		<Progress value={progress} className="w-full">
-			<ProgressLabel>Session progress</ProgressLabel>
-			<ProgressValue />
-		</Progress>
-	)
-}
-
-const zodSession = z.object({
-	userAnswer: z.string(),
-})
-
-const defaultValues: SessionInput = {
-	userAnswer: "",
-}
-
-const Session = (props: { form: SessionForm }) => {
+export const Correction = (props: { form: SessionForm }) => {
 	const { form } = props
-	const currentSentence = useAtomValue(
-		sentenceTranslatorAtoms.currentSentenceAtom,
-	)
-	const [hintVisible, setIsHintVisible] = useAtom(
-		sentenceTranslatorAtoms.hintVisibleAtom,
-	)
-	const correction = useAtomValue(sentenceTranslatorAtoms.correctionAtom)
-	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>{currentSentence.sentence}</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<form.Field
-					name="userAnswer"
-					children={(field) => {
-						const isInvalid =
-							field.state.meta.isTouched && !field.state.meta.isValid
-						return (
-							<Field>
-								<FieldLabel>Translation</FieldLabel>
-								<InputGroup>
-									<InputGroupTextarea
-										id={field.name}
-										name={field.name}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter") {
-												e.preventDefault()
-												form.handleSubmit()
-											}
-										}}
-										aria-invalid={isInvalid}
-										autoComplete="off"
-										placeholder="Type your translation here..."
-									/>
-									<form.Subscribe
-										selector={(state) => state.isSubmitting}
-										children={(isSubmitting) => (
-											<InputGroupAddon align="block-end">
-												<InputGroupButton
-													className="ml-auto"
-													type="button"
-													variant="outline"
-													disabled={!!correction || isSubmitting}
-													onClick={() => {
-														form.setFieldValue("userAnswer", "")
-														form.handleSubmit()
-													}}
-												>
-													<Eye />
-													Reveal answer
-												</InputGroupButton>
-												<InputGroupButton
-													variant="outline"
-													onClick={() => setIsHintVisible((prev) => !prev)}
-													disabled={!!correction || isSubmitting}
-												>
-													<Info />
-													Hint
-												</InputGroupButton>
-												<InputGroupButton
-													type="button"
-													variant="default"
-													onClick={() => form.handleSubmit()}
-													disabled={!!correction || isSubmitting}
-												>
-													<BotMessageSquare />
-													Check answer
-												</InputGroupButton>
-											</InputGroupAddon>
-										)}
-									/>
-								</InputGroup>
-								{hintVisible && (
-									<FieldDescription className="text-sm text-muted-foreground mt-2">
-										Hint: {currentSentence.hint}
-									</FieldDescription>
-								)}
-							</Field>
-						)
-					}}
-				/>
-			</CardContent>
-		</Card>
-	)
-}
-
-const Correction = (props: { form: SessionForm }) => {
-	const { form } = props
-	const correction = useAtomValue(sentenceTranslatorAtoms.correctionAtom)
-	const currentSentence = useAtomValue(
-		sentenceTranslatorAtoms.currentSentenceAtom,
-	)
-	const sentences = useAtomValue(sentenceTranslatorAtoms.sentencesAtom)
-	const indexSentence = useAtomValue(sentenceTranslatorAtoms.indexSentenceAtom)
-	const nextSentence = useSetAtom(sentenceTranslatorAtoms.nextSentenceAtom)
-	const reset = useSetAtom(sentenceTranslatorAtoms.resetAtom)
+	const correction = useAtomValue(sentenceTranslator.correctionAtom)
+	const currentSentence = useAtomValue(sentenceTranslator.currentSentenceAtom)
+	const sentences = useAtomValue(sentenceTranslator.sentencesAtom)
+	const indexSentence = useAtomValue(sentenceTranslator.indexSentenceAtom)
+	const nextSentence = useSetAtom(sentenceTranslator.nextSentenceAtom)
+	const reset = useSetAtom(sentenceTranslator.resetAtom)
 	const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 	if (isSubmitting) {
 		return (

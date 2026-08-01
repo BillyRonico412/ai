@@ -2,6 +2,7 @@ import z from "zod"
 
 const zodConfig = z.object({
 	theme: z.string().min(1, { message: "Theme is required" }),
+	lesson: z.string(),
 	nbSentences: z
 		.number()
 		.min(1, { message: "At least one sentence is required" }),

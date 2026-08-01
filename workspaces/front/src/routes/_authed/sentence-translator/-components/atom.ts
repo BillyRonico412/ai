@@ -1,4 +1,5 @@
 import { type Outputs, trpcClient } from "@front/lib/trpc"
+import themes from "@front/routes/_authed/sentence-translator/-components/themes.json"
 import { atom } from "jotai"
 import type { sentenceTranslatorShared } from "shared/sentence-translator"
 import { toast } from "sonner"
@@ -74,25 +75,13 @@ const resetAtom = atom(null, (_, set) => {
 	set(correctionAtom, undefined)
 })
 
-const generateRandomTopicLoadingAtom = atom(false)
+const generateRandomTheme = () => {
+	const randomIndex = Math.floor(Math.random() * themes.length)
+	const theme = themes[randomIndex]
+	return theme
+}
 
-const generateRandomTopicAtom = atom(null, async (_, set) => {
-	try {
-		set(generateRandomTopicLoadingAtom, true)
-		const topic =
-			await trpcClient.sentenceTranslator.generateRandomTopic.mutate()
-		return topic
-	} catch (error) {
-		console.error("Error generating random topic:", error)
-		toast.error(
-			"An error occurred while generating a random topic. Please try again.",
-		)
-	} finally {
-		set(generateRandomTopicLoadingAtom, false)
-	}
-})
-
-export const sentenceTranslatorAtoms = {
+export const sentenceTranslator = {
 	phaseAtom,
 	generateSentencesAtom,
 	sentencesAtom,
@@ -102,7 +91,6 @@ export const sentenceTranslatorAtoms = {
 	checkAnswerAtom,
 	nextSentenceAtom,
 	resetAtom,
-	generateRandomTopicAtom,
-	generateRandomTopicLoadingAtom,
+	generateRandomTheme,
 	hintVisibleAtom,
 }

@@ -2,16 +2,15 @@
   "name": "ai-sdk",
   "module": "index.ts",
   "type": "module",
-  "devDependencies": {
-    "@biomejs/biome": "2.5.0",
-    "@types/bun": "latest"
-  },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "workspaces": [
     "workspaces/*"
   ],
+  "scripts": {
+    "dev": "bun x concurrently \"cd workspaces/front && bun dev\" \"cd workspaces/back && bun dev\""
+  },
   "dependencies": {
     "@tanstack/react-query": "^5.101.0",
     "@trpc/client": "^11.17.0",
@@ -21,5 +20,10 @@
     "superjson": "^2.2.6",
     "zod": "^4.4.3",
     "typescript": "~7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.0",
+    "@types/bun": "latest",
+    "concurrently": "^10.0.4"
   }
 }
