@@ -8,6 +8,10 @@ export const sentenceTranslatorRouter = router({
 	generateSentences: quotaProcedure
 		.input(sentenceTranslatorShared.zodConfig)
 		.query(async ({ input, ctx }) => {
+			let prompt = `Génère ${input.nbSentences} phrases en français sur le thème "${input.theme}" pour un niveau ${input.level}.`
+			if (input.lesson) {
+				prompt += ` La lesson à approfondir est "${input.lesson}".`
+			}
 			const res = await generateText({
 				model: "google/gemini-3.5-flash-lite",
 				system: generateSentenceSystemPrompt,
@@ -22,7 +26,7 @@ export const sentenceTranslatorRouter = router({
 						),
 					}),
 				}),
-				prompt: `Génère ${input.nbSentences} phrases en français sur le thème "${input.theme}" pour un niveau ${input.level}.`,
+				prompt,
 			})
 			await increaseQuota(ctx.user.id)
 			return res.output.sentences
