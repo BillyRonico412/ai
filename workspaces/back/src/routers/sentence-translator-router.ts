@@ -13,7 +13,7 @@ export const sentenceTranslatorRouter = router({
 				prompt += ` La lesson à approfondir est "${input.lesson}".`
 			}
 			const res = await generateText({
-				model: "google/gemini-3.5-flash-lite",
+				model: "anthropic/claude-opus-4.8",
 				system: generateSentenceSystemPrompt,
 				reasoning: "none",
 				output: Output.object({
@@ -35,7 +35,7 @@ export const sentenceTranslatorRouter = router({
 		.input(sentenceTranslatorShared.zodCorrectAnswer)
 		.query(async ({ input, ctx }) => {
 			const res = await generateText({
-				model: "google/gemini-3.5-flash-lite",
+				model: "anthropic/claude-opus-4.8",
 				system: correctAnswerSystemPrompt,
 				reasoning: "none",
 				output: Output.object({
